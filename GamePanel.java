@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.*;
@@ -14,6 +15,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     private int score = 0;
     private int highScore = 0;
+    private int nyawa = 3;
 
     // Warna dan font
     private final Font scoreFont = new Font("Comic Sans MS", Font.BOLD, 20);
@@ -60,12 +62,17 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         g.setColor(Color.BLACK);
         g.drawString("Score: " + score, 10, 30);
         g.drawString("High Score: " + highScore, 10, 60);
+        g.drawString("Nyawa: " + nyawa, 10, 90);
     }
 
     @Override
     public void run() {
         while (running) {
-            updateGameLogic();
+            try {
+                updateGameLogic();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             repaint();
             try {
                 Thread.sleep(30); // Kontrol kecepatan permainan
@@ -75,7 +82,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         }
     }
 
-    private void updateGameLogic() {
+    private void updateGameLogic() throws SQLException {
         // Perbarui posisi buah
         for (int i = 0; i < fruits.size(); i++) {
             Fruit fruit = fruits.get(i);
@@ -86,7 +93,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
                 fruit.x + fruit.width > basket.x &&
                 fruit.x < basket.x + basket.width) {
                 fruits.remove(i);
-                score++;
+                score += fruit.getScore();
                 if (score > highScore) {
                     highScore = score;
                 }
@@ -94,7 +101,16 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             // Jika buah jatuh melewati layar
             else if (fruit.y > getHeight()) {
                 fruits.remove(i);
-                score = 0; // Reset skor jika gagal menangkap buah
+                nyawa--;
+                if(nyawa == 0){
+                    Database database = new Database();
+                    String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda");
+                    Player player = new Player(nama, score);
+                    database.addPlayer(player);
+                    fruits.clear();
+                    nyawa = 3;
+                    score = 0;
+                }
             }
         }
 
@@ -114,5 +130,21 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     public void mouseMoved(MouseEvent e) {
         // Perbarui posisi keranjang berdasarkan pergerakan mouse
         basket.move(e.getX(), getWidth());
+    }
+
+    // Method memulai game dari awal ketika GameOver
+    public void resetGame(){
+        running = false;
+        try {
+            if (gameThread != null) {
+                gameThread.join(); // Tunggu hingga thread selesai
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        fruits.clear();
+        score = 0;
+        nyawa = 3;
+        startGame();
     }
 }
