@@ -1,16 +1,27 @@
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 class Fruit extends GameObject {
-    private final Color[] fruitColors = {
-            Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.MAGENTA
-    };
-    private final Color color;
+    private final Image[] fruitImages = new Image[3]; // Array for fruit images
+    private final Image image;
     private int score = 0;
 
     public Fruit(int x, int y, int width, int height) {
         super(x, y, width, height);
-        // Pilih warna buah secara acak
-        this.color = fruitColors[(int) (Math.random() * fruitColors.length)];
+        // Load images for fruits
+        try {
+            fruitImages[0] = ImageIO.read(new File("assets/images/apel.png"));
+            fruitImages[1] = ImageIO.read(new File("assets/images/semangka.png"));
+            fruitImages[2] = ImageIO.read(new File("assets/images/pisang.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Randomly select a fruit image
+        this.image = fruitImages[(int) (Math.random() * fruitImages.length)];
     }
 
     @Override
@@ -20,24 +31,19 @@ class Fruit extends GameObject {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(color);
-        g.fillOval(x, y, width, height); // Buah berbentuk oval
+        g.drawImage(image, x, y, width, height, null); // Draw fruit image
     }
 
-    public int getScore(){
-        if(color == fruitColors[0]){
+    public int getScore() {
+        if (image == fruitImages[0]) {
             score = 3;
-        }
-        else if(color == fruitColors[1]){
+        } else if (image == fruitImages[1]) {
             score = 5;
-        }
-        else if(color == fruitColors[2]){
+        } else if (image == fruitImages[2]) {
             score = 8;
-        }
-        else if(color == fruitColors[3]){
+        } else if (image == fruitImages[3]) {
             score = 11;
-        }
-        else if(color == fruitColors[4]){
+        } else if (image == fruitImages[4]) {
             score = 15;
         }
 

@@ -1,11 +1,19 @@
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 class Basket extends GameObject {
-    private final Color borderColor = Color.DARK_GRAY;
-    private final Color basketColor = new Color(100, 149, 237); // Warna biru estetis
+    private Image basketImage;
 
     public Basket(int x, int y, int width, int height) {
         super(x, y, width, height);
+        // Load the basket image
+        try {
+            basketImage = ImageIO.read(new File("assets/images/keranjang.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void move(int mouseX, int panelWidth) {
@@ -14,14 +22,11 @@ class Basket extends GameObject {
 
     @Override
     public void update() {
-        // Tidak diperlukan logika tambahan untuk keranjang
+        // No additional logic for the basket
     }
 
     @Override
     public void render(Graphics g) {
-        g.setColor(borderColor);
-        g.fillRect(x - 5, y - 5, width + 10, height + 10); // Border keranjang
-        g.setColor(basketColor);
-        g.fillRect(x, y, width, height);
+        g.drawImage(basketImage, x, y, width, height, null); // Draw basket image
     }
 }

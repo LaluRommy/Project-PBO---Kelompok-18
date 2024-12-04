@@ -1,9 +1,13 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
+import javax.swing.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.*;
 
 public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private Thread gameThread;
@@ -17,18 +21,41 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private int highScore = 0;
     private int nyawa = 3;
 
-    // Warna dan font
-    private final Font scoreFont = new Font("Comic Sans MS", Font.BOLD, 20);
-    private final Color basketColor = new Color(54, 69, 79);
-    private final GradientPaint backgroundGradient = new GradientPaint(
-            0, 0, Color.CYAN, 0, 500, Color.PINK);
+    // Load the background image
+    private Image backgroundImage;
+
+    // Audio-related fields
+    private Clip backgroundMusic;
 
     public GamePanel() {
         this.setFocusable(true);
         this.addMouseMotionListener(this);
 
-        // Inisialisasi keranjang
-        basket = new Basket(200, 450, 100, 20);
+        // Initialize the basket
+        basket = new Basket(0, 900, 150, 100); // Start basket at the top for now
+
+        // Load background image
+        try {
+            backgroundImage = ImageIO.read(new File("assets/images/background.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Load and play background music
+        playBackgroundMusic();
+    }
+
+    private void playBackgroundMusic() {
+        try {
+            // Load the musi.wav file
+            File musicFile = new File("assets/music/backsound.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusic = AudioSystem.getClip();
+            backgroundMusic.open(audioStream);
+            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music indefinitely
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startGame() {
@@ -43,26 +70,23 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2d = (Graphics2D) g;
+        // Draw the background image
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
 
-        // Latar belakang gradasi
-        g2d.setPaint(backgroundGradient);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
+        // Draw the basket at the bottom
+        basket.render(g);
 
-        // Gambar keranjang
-        basket.render(g2d);
-
-        // Gambar buah
+        // Draw the fruits
         for (Fruit fruit : fruits) {
-            fruit.render(g2d);
+            fruit.render(g);
         }
 
-        // Tampilkan skor dengan font estetis
-        g.setFont(scoreFont);
+        // Display the score with an aesthetic font
+        g.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
         g.setColor(Color.BLACK);
         g.drawString("Score: " + score, 10, 30);
         g.drawString("High Score: " + highScore, 10, 60);
-        g.drawString("Nyawa: " + nyawa, 10, 90);
+        g.drawString("Lives: " + nyawa, 10, 90);
     }
 
     @Override
@@ -75,7 +99,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             }
             repaint();
             try {
-                Thread.sleep(30); // Kontrol kecepatan permainan
+                Thread.sleep(30); // Control the speed of the game
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -83,26 +107,26 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     }
 
     private void updateGameLogic() throws SQLException {
-        // Perbarui posisi buah
+        // Update the position of the fruits
         for (int i = 0; i < fruits.size(); i++) {
             Fruit fruit = fruits.get(i);
             fruit.update();
 
-            // Jika buah tertangkap oleh keranjang
+            // If the fruit is caught by the basket
             if (fruit.y + fruit.height >= basket.y &&
-                fruit.x + fruit.width > basket.x &&
-                fruit.x < basket.x + basket.width) {
+                    fruit.x + fruit.width > basket.x &&
+                    fruit.x < basket.x + basket.width) {
                 fruits.remove(i);
                 score += fruit.getScore();
                 if (score > highScore) {
                     highScore = score;
                 }
             }
-            // Jika buah jatuh melewati layar
+            // If the fruit falls off the screen
             else if (fruit.y > getHeight()) {
                 fruits.remove(i);
                 nyawa--;
-                if(nyawa == 0){
+                if (nyawa == 0) {
                     Database database = new Database();
                     String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda");
                     Player player = new Player(nama, score);
@@ -110,34 +134,43 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
                     fruits.clear();
                     nyawa = 3;
                     score = 0;
+                    // Stop the music when the game ends
+                    stopBackgroundMusic();
                 }
             }
         }
 
-        // Tambahkan buah baru secara acak
+        // Add a new fruit randomly
         if (random.nextInt(20) == 0) {
-            int fruitX = random.nextInt(getWidth() - 30);
-            fruits.add(new Fruit(fruitX, 0, 30, 30));
+            int fruitX = random.nextInt(getWidth() - 5);
+            fruits.add(new Fruit(fruitX, 0, 60, 60));
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        // Tidak digunakan
+        // Not used
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        // Perbarui posisi keranjang berdasarkan pergerakan mouse
+        // Update the basket position based on mouse movement
         basket.move(e.getX(), getWidth());
     }
 
-    // Method memulai game dari awal ketika GameOver
-    public void resetGame(){
+    // Method to stop the background music
+    private void stopBackgroundMusic() {
+        if (backgroundMusic != null && backgroundMusic.isRunning()) {
+            backgroundMusic.stop();
+        }
+    }
+
+    // Method to restart the game after Game Over
+    public void resetGame() {
         running = false;
         try {
             if (gameThread != null) {
-                gameThread.join(); // Tunggu hingga thread selesai
+                gameThread.join(); // Wait for the thread to finish
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -146,5 +179,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         score = 0;
         nyawa = 3;
         startGame();
+        // Restart the music when the game restarts
+        playBackgroundMusic();
     }
 }
