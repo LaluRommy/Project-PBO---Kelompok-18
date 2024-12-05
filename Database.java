@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Database {
     private String url = "jdbc:mysql://localhost:3306/basketdash";
@@ -21,6 +22,22 @@ public class Database {
             e.printStackTrace();
         }
 
+    }
+
+    public ArrayList<Player> getPlayers() throws SQLException{
+        String query = "SELECT * FROM player";
+        ArrayList<Player> players = new ArrayList<>();
+
+        try (Connection conn = connect(); Statement statement = conn.createStatement(); ResultSet rs = statement.executeQuery(query)){
+            while (rs.next()) {
+                Player getPlayer = new Player(rs.getString("nama"), rs.getInt("score"));
+                players.add(getPlayer);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return players;
     }
     
 }

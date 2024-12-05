@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
+    private JFrame mainFrame = new JFrame();
     private Thread gameThread;
     private boolean running = false;
 
@@ -27,12 +28,13 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     // Audio-related fields
     private Clip backgroundMusic;
 
-    public GamePanel() {
+    public GamePanel(JFrame mainFrame) {
+        this.mainFrame = mainFrame;
         this.setFocusable(true);
         this.addMouseMotionListener(this);
 
         // Initialize the basket
-        basket = new Basket(0, 900, 150, 100); // Start basket at the top for now
+        basket = new Basket(450, 900, 150, 100); // Start basket at the top for now
 
         // Load background image
         try {
@@ -128,14 +130,18 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
                 nyawa--;
                 if (nyawa == 0) {
                     Database database = new Database();
-                    String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda");
+                    String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
+                    if (nama == null || nama.trim().isEmpty()) {
+                        nama = "Player";
+                    }
+                    
                     Player player = new Player(nama, score);
                     database.addPlayer(player);
-                    fruits.clear();
-                    nyawa = 3;
-                    score = 0;
-                    // Stop the music when the game ends
-                    stopBackgroundMusic();
+                    mainFrame.getContentPane().removeAll();
+                    mainFrame.add(new ScorePanel());
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                    stopGame();
                 }
             }
         }
@@ -166,8 +172,9 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     }
 
     // Method to restart the game after Game Over
-    public void resetGame() {
+    public void stopGame() {
         running = false;
+        stopBackgroundMusic();
         try {
             if (gameThread != null) {
                 gameThread.join(); // Wait for the thread to finish
@@ -175,11 +182,5 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        fruits.clear();
-        score = 0;
-        nyawa = 3;
-        startGame();
-        // Restart the music when the game restarts
-        playBackgroundMusic();
     }
 }
