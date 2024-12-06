@@ -119,9 +119,10 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
                     fruit.x + fruit.width > basket.x &&
                     fruit.x < basket.x + basket.width) {
        
-                //Jika terkena bom
+                //Jika yang terkena adalah bom
                 if (fruit.hitDynamite()) {
                     nyawa--;
+                    gameOver();
                 }
                 
                 fruits.remove(i);
@@ -133,22 +134,8 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             // If the fruit falls off the screen
             else if (fruit.y > getHeight()) {
                 fruits.remove(i);
-                //nyawa--;
-                if (nyawa == 0) {
-                    Database database = new Database();
-                    String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
-                    if (nama == null || nama.trim().isEmpty()) {
-                        nama = "Player";
-                    }
-                    
-                    Player player = new Player(nama, score);
-                    database.addPlayer(player);
-                    mainFrame.getContentPane().removeAll();
-                    mainFrame.add(new ScorePanel());
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                    stopGame();
-                }
+                gameOver();
+                //nyawa--;  
             }
         }
 
@@ -187,6 +174,24 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void gameOver() throws SQLException{
+        if (nyawa == 0) {
+            Database database = new Database();
+            String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
+            if (nama == null || nama.trim().isEmpty()) {
+                nama = "Player";
+            }
+            
+            Player player = new Player(nama, score);
+            database.addPlayer(player);
+            mainFrame.getContentPane().removeAll();
+            mainFrame.add(new ScorePanel());
+            mainFrame.revalidate();
+            mainFrame.repaint();
+            stopGame();
         }
     }
 }
