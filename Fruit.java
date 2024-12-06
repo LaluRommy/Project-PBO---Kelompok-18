@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 class Fruit extends GameObject {
-    private final Image[] fruitImages = new Image[3]; // Array for fruit images
+    private final Image[] fruitImages = new Image[4]; // Array for fruit images
     private final Image image;
     private int score = 0;
 
@@ -16,6 +16,7 @@ class Fruit extends GameObject {
             fruitImages[0] = ImageIO.read(new File("assets/images/apel.png"));
             fruitImages[1] = ImageIO.read(new File("assets/images/semangka.png"));
             fruitImages[2] = ImageIO.read(new File("assets/images/pisang.png"));
+            fruitImages[3] = ImageIO.read(new File("assets/images/dynamite.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,15 +39,17 @@ class Fruit extends GameObject {
         if (image == fruitImages[0]) {
             score = 3;
         } else if (image == fruitImages[1]) {
-            score = 5;
-        } else if (image == fruitImages[2]) {
             score = 8;
-        } else if (image == fruitImages[3]) {
-            score = 11;
-        } else if (image == fruitImages[4]) {
-            score = 15;
+        } else if (image == fruitImages[2]) {
+            score = 5;
         }
-
         return score;
+    }
+
+    public boolean hitDynamite(){
+        if (image == fruitImages[3]) {
+            return true;
+        } else 
+            return false;
     }
 }

@@ -64,7 +64,7 @@ public class ScorePanel extends JPanel {
         }
 
         JLabel menu = new JLabel("Back to Main Menu", JLabel.CENTER);
-        menu.setFont(new Font("Comic Sans MS", Font.BOLD, 50));
+        menu.setFont(new Font("Comic Sans MS", Font.BOLD, 35));
         menu.setForeground(Color.BLACK);
 
         menu.addMouseListener(new MouseAdapter(){
