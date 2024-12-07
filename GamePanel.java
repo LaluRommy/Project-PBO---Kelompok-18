@@ -34,7 +34,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         this.addMouseMotionListener(this);
 
         // Initialize the basket
-        basket = new Basket(0, 380, 120, 100); // Start basket at the top for now
+        basket = new Basket(0, 900, 120, 100); // Start basket at the top for now
 
         // Load background image
         try {
@@ -118,13 +118,13 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             if (fruit.y + fruit.height >= basket.y &&
                     fruit.x + fruit.width > basket.x &&
                     fruit.x < basket.x + basket.width) {
-       
-                //Jika yang terkena adalah bom
+
+                // Jika yang terkena adalah bom
                 if (fruit.hitDynamite()) {
                     nyawa--;
                     gameOver();
                 }
-                
+
                 fruits.remove(i);
                 score += fruit.getScore();
                 if (score > highScore) {
@@ -135,7 +135,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             else if (fruit.y > getHeight()) {
                 fruits.remove(i);
                 gameOver();
-                //nyawa--;  
+                // nyawa--;
             }
         }
 
@@ -177,14 +177,14 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         }
     }
 
-    public void gameOver() throws SQLException{
+    public void gameOver() throws SQLException {
         if (nyawa == 0) {
             Database database = new Database();
             String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
             if (nama == null || nama.trim().isEmpty()) {
                 nama = "Player";
             }
-            
+
             Player player = new Player(nama, score);
             database.addPlayer(player);
             mainFrame.getContentPane().removeAll();
