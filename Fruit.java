@@ -46,10 +46,10 @@ class Fruit extends GameObject {
         return score;
     }
 
-    public boolean hitDynamite(){
+    public boolean hitDynamite() {
         if (image == fruitImages[3]) {
             return true;
-        } else 
+        } else
             return false;
     }
 }
