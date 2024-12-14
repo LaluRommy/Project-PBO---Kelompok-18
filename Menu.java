@@ -10,7 +10,8 @@ public class Menu {
     private JFrame frame;
 
     // Initialize the GUI
-    private void initGUI() {
+    public Menu(JFrame newFrame) {
+        frame = newFrame;
         frame = new JFrame("FruitBasket Dash");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000, 600);
@@ -109,6 +110,7 @@ public class Menu {
         JFrame gameFrame = new JFrame("Basket Dash");
         gameFrame.setSize(1000, 600);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameFrame.setLocationRelativeTo(null);
 
         GamePanel gamePanel = new GamePanel(gameFrame); // Assuming GamePanel class is available
         gameFrame.add(gamePanel);
@@ -119,35 +121,9 @@ public class Menu {
 
     // Method to display the leaderboard
     private void showLeaderboard() {
-        // Create a new frame for the leaderboard
-        JFrame leaderboardFrame = new JFrame("Leaderboard");
-        leaderboardFrame.setSize(500, 500);
-        leaderboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        // Sample leaderboard data (you could load this from a file or database)
-        String[] leaderboardData = {
-                "Player 1 - 5000",
-                "Player 2 - 4500",
-                "Player 3 - 4000",
-                "Player 4 - 3500",
-                "Player 5 - 3000"
-        };
-
-        // Create a list to display the leaderboard
-        JList<String> leaderboardList = new JList<>(leaderboardData);
-        leaderboardList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        leaderboardList.setLayoutOrientation(JList.VERTICAL);
-        leaderboardList.setVisibleRowCount(10);
-
-        JScrollPane scrollPane = new JScrollPane(leaderboardList);
-        leaderboardFrame.add(scrollPane, BorderLayout.CENTER);
-
-        leaderboardFrame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        // Create an instance of Menu and initialize the GUI
-        Menu menu = new Menu();
-        menu.initGUI();
+        frame.getContentPane().removeAll();
+        frame.add(new ScorePanel(frame));
+        frame.revalidate();
+        frame.repaint();
     }
 }

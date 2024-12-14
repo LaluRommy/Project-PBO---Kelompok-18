@@ -21,7 +21,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private int score = 0;
     private int highScore = 0;
     private int nyawa = 3;
-    private int maxFruit = 1;
+    private int maxFruit = 3;
 
     // Load the background image
     private Image backgroundImage;
@@ -174,7 +174,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         }
     }
 
-    // Method to restart the game after Game Over
+    // Method to stop the game after Game Over
     public void stopGame() {
         running = false;
         stopBackgroundMusic();
@@ -189,25 +189,23 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     public void gameOver() throws SQLException {
         if (nyawa == 0) {
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    Database database = new Database();
-                    String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
-                    if (nama == null || nama.trim().isEmpty()) {
-                        nama = "Player";
-                    }
-        
-                    Player player = new Player(nama, score);
-                    database.addPlayer(player);
-                    mainFrame.getContentPane().removeAll();
-                    mainFrame.add(new ScorePanel());
-                    mainFrame.revalidate();
-                    mainFrame.repaint();
-                    stopGame();
-                } catch (Exception e) {
-                    e.printStackTrace();
+            try {
+                Database database = new Database();
+                String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
+                if (nama == null || nama.trim().isEmpty()) {
+                    nama = "Player";
                 }
-            });
+                    
+                Player player = new Player(nama, score);
+                database.addPlayer(player);
+                mainFrame.getContentPane().removeAll();
+                mainFrame.add(new ScorePanel(mainFrame));
+                mainFrame.revalidate();
+                mainFrame.repaint();
+                stopGame();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

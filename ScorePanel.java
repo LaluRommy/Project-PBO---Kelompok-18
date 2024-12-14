@@ -10,12 +10,14 @@ import java.awt.event.*;
 
 public class ScorePanel extends JPanel {
     private Image backgroundImage;
+    private JFrame frameInduk;
     Database database = new Database();
     ArrayList<Player> player;
 
-    public ScorePanel() {
+    public ScorePanel(JFrame frame) {
+        frameInduk = frame;
         try {
-            backgroundImage = ImageIO.read(new File("assets/images/background.jpg"));
+            backgroundImage = ImageIO.read(new File("assets/images/background.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,7 +71,9 @@ public class ScorePanel extends JPanel {
 
         menu.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-
+                JFrame frame = new JFrame();
+                frameInduk.dispose();
+                new Menu(frame);
             }
         });
         add(menu, BorderLayout.SOUTH);
