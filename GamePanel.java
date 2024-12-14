@@ -21,7 +21,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private int score = 0;
     private int highScore = 0;
     private int nyawa = 3;
-    private int maxFruit = 3;
+    private int maxFruit = 1;
 
     // Load the background image
     private Image backgroundImage;
