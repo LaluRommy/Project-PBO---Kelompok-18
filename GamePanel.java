@@ -21,6 +21,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private int score = 0;
     private int highScore = 0;
     private int nyawa = 3;
+    private int maxFruit = 1;
 
     // Load the background image
     private Image backgroundImage;
@@ -29,12 +30,13 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private Clip backgroundMusic;
 
     public GamePanel(JFrame mainFrame) {
+        setDoubleBuffered(true);
         this.mainFrame = mainFrame;
         this.setFocusable(true);
         this.addMouseMotionListener(this);
 
         // Initialize the basket
-        basket = new Basket(0, 900, 120, 100); // Start basket at the top for now
+        basket = new Basket(0, 450, 120, 100); // Start basket at the top for now
 
         // Load background image
         try {
@@ -49,7 +51,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     private void playBackgroundMusic() {
         try {
-            // Load the musi.wav file
+            // Load the music.wav file
             File musicFile = new File("assets/music/backsound.wav");
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
             backgroundMusic = AudioSystem.getClip();
@@ -93,17 +95,25 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     @Override
     public void run() {
+        int fps = 30;
+        long time = 1000000000 / fps;
+
         while (running) {
+            long starTime = System.nanoTime();
             try {
                 updateGameLogic();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             repaint();
-            try {
-                Thread.sleep(30); // Control the speed of the game
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+
+            long sleepTime = time - (System.nanoTime() - starTime);
+            if(sleepTime > 0){
+                try {
+                    Thread.sleep(sleepTime / 1000000); // Control the speed of the game
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -140,7 +150,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         }
 
         // Add a new fruit randomly
-        if (random.nextInt(20) == 0) {
+        if (fruits.size() < maxFruit && random.nextInt(20) == 0) {
             int fruitX = random.nextInt(getWidth() - 5);
             fruits.add(new Fruit(fruitX, 0, 60, 60));
         }
@@ -179,19 +189,25 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     public void gameOver() throws SQLException {
         if (nyawa == 0) {
-            Database database = new Database();
-            String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
-            if (nama == null || nama.trim().isEmpty()) {
-                nama = "Player";
-            }
-
-            Player player = new Player(nama, score);
-            database.addPlayer(player);
-            mainFrame.getContentPane().removeAll();
-            mainFrame.add(new ScorePanel());
-            mainFrame.revalidate();
-            mainFrame.repaint();
-            stopGame();
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    Database database = new Database();
+                    String nama = JOptionPane.showInputDialog(null, "Game Over!!! \n Masukkan Nama Anda", null);
+                    if (nama == null || nama.trim().isEmpty()) {
+                        nama = "Player";
+                    }
+        
+                    Player player = new Player(nama, score);
+                    database.addPlayer(player);
+                    mainFrame.getContentPane().removeAll();
+                    mainFrame.add(new ScorePanel());
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+                    stopGame();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 }
