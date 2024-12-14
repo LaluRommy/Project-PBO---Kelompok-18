@@ -1,13 +1,9 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public class Menu {
 
@@ -44,26 +40,26 @@ public class Menu {
         // Start button with image
         ImageIcon startBt = new ImageIcon(
                 new ImageIcon("assets/images/play.png")
-                        .getImage().getScaledInstance(300, 50, Image.SCALE_SMOOTH));
+                        .getImage().getScaledInstance(300, 100, Image.SCALE_SMOOTH));
         JButton startButton_1 = new JButton(startBt);
         startButton_1.setFocusable(false);
         startButton_1.setOpaque(false);
         startButton_1.setContentAreaFilled(false);
         startButton_1.setBorderPainted(false); // Remove border around the button
         // startButton_1.setPreferredSize(new Dimension(200, 300));
-        startButton_1.setBorder(new EmptyBorder(0, 0, 0, 0));
+        startButton_1.setBorder(new EmptyBorder(320, 0, 0, 0));
 
         // Leaderboard button with image
         ImageIcon startBt_2 = new ImageIcon(
                 new ImageIcon("assets/images/leaderboard.png")
-                        .getImage().getScaledInstance(300, 50, Image.SCALE_SMOOTH));
+                        .getImage().getScaledInstance(300, 100, Image.SCALE_SMOOTH));
         JButton leaderboardButoon = new JButton(startBt_2);
         leaderboardButoon.setFocusable(false);
         leaderboardButoon.setOpaque(false);
         leaderboardButoon.setContentAreaFilled(false);
         leaderboardButoon.setBorderPainted(false); // Remove border around the button
         // leaderboardButoon.setPreferredSize(new Dimension(200, 400));
-        leaderboardButoon.setBorder(new EmptyBorder(0, 0, 150, 0));
+        leaderboardButoon.setBorder(new EmptyBorder(0, 0, 100, 0));
 
         // Add action listener to the start button
         startButton_1.addActionListener(new ActionListener() {

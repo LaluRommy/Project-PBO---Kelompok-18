@@ -38,7 +38,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
         // Load background image
         try {
-            backgroundImage = ImageIO.read(new File("assets/images/background.jpg"));
+            backgroundImage = ImageIO.read(new File("assets/images/background.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
