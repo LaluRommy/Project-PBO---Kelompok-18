@@ -1,12 +1,12 @@
+package panel;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Menu {
-
     private JFrame frame;
 
     // Initialize the GUI
@@ -97,8 +97,7 @@ public class Menu {
 
     // This method will initialize the start panel when the button is clicked
     private void initStartPanel() {
-        // Hide the main menu frame
-        frame.setVisible(false);
+        frame.dispose();
 
         // Now, launch the game (BasketDash)
         launchGame();

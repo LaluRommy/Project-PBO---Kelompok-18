@@ -1,10 +1,12 @@
+package model;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
+import gameObject.GameObject;
 
-class Fruit extends GameObject {
+public class Fruit extends GameObject {
     private final Image[] fruitImages = new Image[4]; // Array for fruit images
     private final Image image;
     private int score = 0;

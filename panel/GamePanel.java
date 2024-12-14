@@ -1,3 +1,5 @@
+package panel;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -8,6 +10,9 @@ import javax.swing.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
+import gameObject.*;
+import model.*;
+import database.Database;
 
 public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private JFrame mainFrame = new JFrame();
@@ -159,6 +164,29 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private void updateGameLogic() throws SQLException {
         // Update the position of the fruits
         synchronized (fruits){
+
+            // menambahkan buah yang jatuh
+            if (maxFruit < 5) {
+                if(score < 80){
+                    maxFruit = 1;
+                }
+
+                if(score > 80 && score < 180){
+                    maxFruit = 2;
+                }
+
+                if (score > 180 && score < 280){
+                    maxFruit = 3;
+                }
+
+                if (score > 280 && score < 380) {
+                    maxFruit = 4;
+                }
+
+                if(score > 380){
+                    maxFruit = 5;
+                }
+            }
             for (int i = 0; i < fruits.size(); i++) {
                 Fruit fruit = fruits.get(i);
                 fruit.update();
@@ -183,7 +211,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
                 // If the fruit falls off the screen
                 else if (fruit.y > getHeight()) {
                     fruits.remove(i);
-                    // nyawa--;
+                    //nyawa--;
                 }
             }
     

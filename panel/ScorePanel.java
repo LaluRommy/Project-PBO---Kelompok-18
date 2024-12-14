@@ -1,3 +1,5 @@
+package panel;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -7,12 +9,14 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
 import java.awt.event.*;
+import model.Player;
+import database.Database;;
 
 public class ScorePanel extends JPanel {
     private Image backgroundImage;
     private JFrame frameInduk;
-    Database database = new Database();
-    ArrayList<Player> player;
+    private Database database = new Database();
+    private ArrayList<Player> player;
 
     public ScorePanel(JFrame frame) {
         frameInduk = frame;

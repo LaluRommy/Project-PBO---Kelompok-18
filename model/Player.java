@@ -1,3 +1,5 @@
+package model;
+
 public class Player {
     private String nama;
     private int score;

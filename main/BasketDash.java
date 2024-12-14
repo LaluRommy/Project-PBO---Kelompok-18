@@ -1,3 +1,6 @@
+package main;
+
+import panel.Menu;
 import javax.swing.*;
 
 public class BasketDash {

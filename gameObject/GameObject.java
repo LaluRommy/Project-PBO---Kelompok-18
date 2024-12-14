@@ -1,7 +1,9 @@
+package gameObject;
+
 import java.awt.*;
 
-abstract class GameObject {
-    protected int x, y, width, height;
+public abstract class GameObject {
+    public int x, y, width, height;
 
     public GameObject(int x, int y, int width, int height) {
         this.x = x;

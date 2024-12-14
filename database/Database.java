@@ -1,12 +1,15 @@
+package database;
+
 import java.sql.*;
 import java.util.ArrayList;
+import model.*;;
 
 public class Database {
     private String url = "jdbc:mysql://localhost:3306/basketdash";
     private String username = "root";
     private String password = "";
 
-    private Connection connect() throws SQLException{
+    public Connection connect() throws SQLException{
         return DriverManager.getConnection(url, username, password);
     }
 
