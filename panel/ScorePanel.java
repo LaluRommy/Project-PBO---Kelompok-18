@@ -74,6 +74,8 @@ public class ScorePanel extends JPanel {
         menu.setForeground(Color.BLACK);
 
         menu.addMouseListener(new MouseAdapter(){
+            
+            @Override
             public void mouseClicked(MouseEvent e){
                 JFrame frame = new JFrame();
                 frameInduk.dispose();

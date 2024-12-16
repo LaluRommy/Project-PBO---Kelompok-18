@@ -18,16 +18,14 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
     private JFrame mainFrame = new JFrame();
     private Thread gameThread;
     private boolean running = false;
-    private boolean renderRunning = false;
 
     private Basket basket;
     private final ArrayList<Fruit> fruits = new ArrayList<>();
     private final Random random = new Random();
-    private Thread renderThread;
 
     private int score = 0;
     private int highScore = 0;
-    private int nyawa = 3;
+    private int nyawa = 1;
     private int maxFruit = 1;
 
     // Load the background image
@@ -67,39 +65,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
-    
-    }
-    public void startRender(){
-        renderRunning = true;
-        renderThread = new Thread(() -> {
-            int fps = 30;
-            long time = 1000000000 / fps;
-    
-            while (renderRunning) {
-                long starTime = System.nanoTime();
-                repaint();
-                long sleepTime = time - (System.nanoTime() - starTime);
-                if(sleepTime > 0){
-                    try {
-                        Thread.sleep(sleepTime / 1000000); // Control the speed of the game
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        renderThread.start();
-    }
 
-    public void stopRenderThread(){
-        renderRunning = false;
-        try {
-            if(renderThread != null){
-                renderThread.join();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void startGame() {
@@ -107,7 +73,6 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             running = true;
             gameThread = new Thread(this);
             gameThread.start();
-            startRender();
         }
     }
 
@@ -122,10 +87,8 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
         basket.render(g);
 
         // Draw the fruits
-        synchronized (fruits){
-            for (Fruit fruit : fruits) {
-                fruit.render(g);
-            }
+        for (Fruit fruit : fruits) {
+            fruit.render(g);
         }
 
         // Display the score with an aesthetic font
@@ -151,7 +114,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
             repaint();
 
             long sleepTime = time - (System.nanoTime() - starTime);
-            if(sleepTime > 0){
+            if (sleepTime > 0) {
                 try {
                     Thread.sleep(sleepTime / 1000000); // Control the speed of the game
                 } catch (InterruptedException e) {
@@ -163,63 +126,60 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     private void updateGameLogic() throws SQLException {
         // Update the position of the fruits
-        synchronized (fruits){
+        // menambahkan buah yang jatuh
+        if (maxFruit < 5) {
+            if (score < 80) {
+                maxFruit = 1;
+            }
 
-            // menambahkan buah yang jatuh
-            if (maxFruit < 5) {
-                if(score < 80){
-                    maxFruit = 1;
+            if (score > 80 && score < 180) {
+                maxFruit = 2;
+            }
+
+            if (score > 180 && score < 280) {
+                maxFruit = 3;
+            }
+
+            if (score > 280 && score < 380) {
+                maxFruit = 4;
+            }
+
+            if (score > 380) {
+                maxFruit = 5;
+            }
+        }
+        for (int i = 0; i < fruits.size(); i++) {
+            Fruit fruit = fruits.get(i);
+            fruit.update();
+
+            // If the fruit is caught by the basket
+            if (fruit.y + fruit.height >= basket.y &&
+                    fruit.x + fruit.width > basket.x &&
+                    fruit.x < basket.x + basket.width) {
+
+                // Jika yang terkena adalah bom
+                if (fruit.hitDynamite()) {
+                    nyawa--;
+                    gameOver();
                 }
 
-                if(score > 80 && score < 180){
-                    maxFruit = 2;
-                }
-
-                if (score > 180 && score < 280){
-                    maxFruit = 3;
-                }
-
-                if (score > 280 && score < 380) {
-                    maxFruit = 4;
-                }
-
-                if(score > 380){
-                    maxFruit = 5;
+                fruits.remove(i);
+                score += fruit.getScore();
+                if (score > highScore) {
+                    highScore = score;
                 }
             }
-            for (int i = 0; i < fruits.size(); i++) {
-                Fruit fruit = fruits.get(i);
-                fruit.update();
-    
-                // If the fruit is caught by the basket
-                if (fruit.y + fruit.height >= basket.y &&
-                        fruit.x + fruit.width > basket.x &&
-                        fruit.x < basket.x + basket.width) {
-    
-                    // Jika yang terkena adalah bom
-                    if (fruit.hitDynamite()) {
-                        nyawa--;
-                        gameOver();
-                    }
-    
-                    fruits.remove(i);
-                    score += fruit.getScore();
-                    if (score > highScore) {
-                        highScore = score;
-                    }
-                }
-                // If the fruit falls off the screen
-                else if (fruit.y > getHeight()) {
-                    fruits.remove(i);
-                    //nyawa--;
-                }
+            // If the fruit falls off the screen
+            else if (fruit.y > getHeight()) {
+                fruits.remove(i);
+                // nyawa--;
             }
-    
-            // Add a new fruit randomly
-            if (fruits.size() < maxFruit && random.nextInt(20) == 0) {
-                int fruitX = random.nextInt(getWidth() - 5);
-                fruits.add(new Fruit(fruitX, 0, 60, 60));
-            }
+        }
+
+        // Add a new fruit randomly
+        if (fruits.size() < maxFruit && random.nextInt(20) == 0) {
+            int fruitX = random.nextInt(getWidth() - 5);
+            fruits.add(new Fruit(fruitX, 0, 60, 60));
         }
     }
 
@@ -243,7 +203,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
 
     // Method to stop the game after Game Over
     public void stopGame() {
-        stopRenderThread();
+        // stopRenderThread();
         running = false;
         stopBackgroundMusic();
         try {
@@ -263,7 +223,7 @@ public class GamePanel extends JPanel implements MouseMotionListener, Runnable {
                 if (nama == null || nama.trim().isEmpty()) {
                     nama = "Player";
                 }
-                    
+
                 Player player = new Player(nama, score);
                 database.addPlayer(player);
                 mainFrame.getContentPane().removeAll();
